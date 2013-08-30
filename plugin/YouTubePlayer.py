@@ -338,8 +338,8 @@ class YouTubePlayer():
         if flashvars.has_key(u"ttsurl"):
             video[u"ttsurl"] = flashvars[u"ttsurl"]
 
-        if flashvars.has_key(u"hlsvp"):                               
-            video[u"hlsvp"] = flashvars[u"hlsvp"]    
+        if flashvars.has_key(u"hlsvp"):
+            video[u"hlsvp"] = flashvars[u"hlsvp"]
 
         for url_desc in flashvars[u"url_encoded_fmt_stream_map"].split(u","):
             url_desc_map = cgi.parse_qs(url_desc)
@@ -382,7 +382,7 @@ class YouTubePlayer():
         elif len(s) == 87:
             return s[6:27] + s[4] + s[28:39] + s[27] + s[40:59] + s[2] + s[60:]
         elif len(s) == 86:
-            return s[83:36:-1] + s[0] + s[35:2:-1]
+            return s[81:73:-1] + s[84] + s[72:58:-1] + s[0] + s[57:35:-1] + s[85] + s[34:0:-1]
         elif len(s) == 85:
             return s[83:34:-1] + s[0] + s[33:27:-1] + s[3] + s[26:19:-1] + s[34] + s[18:3:-1] + s[27]
         elif len(s) == 84:
