@@ -77,7 +77,7 @@ class YouTubePlayer():
         self.core = sys.modules["__main__"].core
         self.login = sys.modules["__main__"].login
         self.subtitles = sys.modules["__main__"].subtitles
-
+        
         self.algoCache = {}
         self._cleanTmpVariables()
 
@@ -312,6 +312,11 @@ class YouTubePlayer():
             data = data[:pos + 1]
         return data
 
+    def normalizeUrl(self, url):
+        if url[0:2] == "//":
+            url = "http:" + url
+        return url
+
     def extractFlashVars(self, data, assets):
         flashvars = {}
         found = False
@@ -333,6 +338,11 @@ class YouTubePlayer():
                 flashvars = data["assets"]
             else:
                 flashvars = data["args"]
+
+        for k in ["html", "css", "js"]:
+            if k in flashvars:
+                flashvars[k] = self.normalizeUrl(flashvars[k])
+
         self.common.log("Step2: " + repr(data))
 
         self.common.log(u"flashvars: " + repr(flashvars), 2)
@@ -444,16 +454,17 @@ class YouTubePlayer():
             try:
                 self.playerData = urllib2.urlopen(request).read()
                 self.playerData = self.playerData.decode('utf-8', 'ignore')
-            except:
+            except Exception as ex:
+                self.printDBG("Error: " + str(sys.exc_info()[0]) + " - " + str(ex))
                 self.printDBG('Unable to download playerUrl webpage')
                 return ''
 
-            # get main function name
+            # get main function name 
             match = re.search("signature=(\w+?)\([^)]\)", self.playerData)
             if match:
                 mainFunName = match.group(1)
                 self.printDBG('Main signature function name = "%s"' % mainFunName)
-            else:
+            else: 
                 self.printDBG('Can not get main signature function name')
                 return ''
 
@@ -514,7 +525,7 @@ class YouTubePlayer():
     def _getfullAlgoCode( self, mainFunName, recDepth = 0 ):
         if self.MAX_REC_DEPTH <= recDepth:
             self.printDBG('_getfullAlgoCode: Maximum recursion depth exceeded')
-            return
+            return 
 
         funBody = self._getLocalFunBody( mainFunName )
         if '' != funBody:
@@ -526,7 +537,7 @@ class YouTubePlayer():
                         self.printDBG("Add local function %s to known functions" % mainFunName)
                         self._getfullAlgoCode( funName, recDepth + 1 )
 
-            # conver code from javascript to python
+            # conver code from javascript to python 
             funBody = self._jsToPy(funBody)
             self.fullAlgoCode += '\n' + funBody + '\n'
         return

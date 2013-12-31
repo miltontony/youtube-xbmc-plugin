@@ -397,12 +397,7 @@ class YouTubeCore():
             return ret_obj
 
         if get("url_data"):
-            url_data = get("url_data")
-            url_data_encoded = {}
-            for k, v in url_data.iteritems():
-                url_data_encoded[k] = unicode(v).encode('utf-8')
-
-            request = urllib2.Request(link, urllib.urlencode(url_data_encoded))
+            request = urllib2.Request(link, urllib.urlencode(get("url_data")))
             request.add_header('Content-Type', 'application/x-www-form-urlencoded')
         elif get("request", "false") == "false":
             if get("proxy"):
