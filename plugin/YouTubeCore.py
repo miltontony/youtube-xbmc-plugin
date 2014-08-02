@@ -180,9 +180,10 @@ class YouTubeCore():
         folders = []
         for node in entries:
             folder = {}
-
-            if len(self.common.parseDOM(node, "yt:deprecated")):
+            print repr(node)
+            if 'yt:deprecated' in node:
                 continue
+
             title = self.common.parseDOM(node, "atom:category", ret="label")[0]
 
             if title:
@@ -429,7 +430,7 @@ class YouTubeCore():
         else:
             request.add_header('User-Agent', self.common.USERAGENT)
 
-            if get("no-language-cookie", "false") == "false" and False:
+            if get("no-language-cookie", "false") == "true":
                 cookie += "PREF=f1=50000000&hl=en; "
 
         if get("login", "false") == "true":
@@ -455,7 +456,7 @@ class YouTubeCore():
 
             if cookie:
                 self.common.log("Setting cookie: " + cookie)
-
+                request.add_header('Cookie', cookie)
             con = urllib2.urlopen(request)
 
             inputdata = con.read()
@@ -537,6 +538,25 @@ class YouTubeCore():
         if len(error) == 0:
             self.common.log("4")
             error = self.common.parseDOM(ret['content'], "div", attrs={"id": "watch7-player-age-gate-content"})
+
+        if len(error) == 0:
+            self.common.log("5")
+            if len(self.common.parseDOM(ret['content'], "input", attrs={"id": "send-code-button"})):
+                error = [self.language(30630)]
+
+        if len(error) == 0:
+            self.common.log("6")
+            if len(self.common.parseDOM(ret['content'], "h1", attrs={"id": "login-challenge-heading"})):
+                error = [self.language(30630)]
+
+        if len(error) == 0:
+            self.common.log("7")
+            if len(self.common.parseDOM(ret['content'], "h2", attrs={"class": "smsauth-interstitial-heading"})):
+                error = [self.language(30630)]
+
+        if len(error) == 0:
+            self.common.log("8")
+            error = self.common.parseDOM(ret['content'], "span", attrs={"class": "error-msg"})
 
         if len(error) > 0:
             self.common.log("Found error: " + repr(error))
@@ -754,9 +774,8 @@ class YouTubeCore():
         result = 1
 
         for tmp in self.common.parseDOM(node, "yt:duration", ret="seconds"):
-            tmp = int(tmp) / 60
             if tmp:
-                result = tmp
+                result = str(int(tmp) / 60)
 
         return result
 
