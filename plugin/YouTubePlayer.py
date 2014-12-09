@@ -467,7 +467,7 @@ class YouTubePlayer():
                 return ''
 
             # get main function name
-            match = re.search("signature=([$a-zA-Z]+)\([^)]\)", playerData)
+            match = re.search("set..signature..([$a-zA-Z]+)\([^)]\)", playerData)
 
             if match:
                 mainFunName = match.group(1)
